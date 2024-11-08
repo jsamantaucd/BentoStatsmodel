@@ -5,7 +5,7 @@ import statsmodels.api as sm
 from sklearn.metrics import mean_squared_error
 from statsmodels.tsa.arima.model import ARIMA
 import bentoml
-
+import joblib
 
 def main():
     # Load the dataset
@@ -44,14 +44,9 @@ def main():
     print("Root Mean Squared Error:", rmse)
 
     # Save model with BentoML
-    saved_model = bentoml.picklable_model.save_model(
-        "arima_forecast_model",
-        model,
-        signatures={"predict": {"batchable": True}},
-    )
-
-    print(f"Model saved: {saved_model}")
-
+    with bentoml.models.create("arima_forecast_model") as bento_model:
+        joblib.dump(model, bento_model.path_of("model.pkl"))
+    print(f"Model saved: {bento_model}")
 
 if __name__ == "__main__":
     main()
