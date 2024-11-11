@@ -13,13 +13,14 @@ class ArimaForecast:
     """
 
     # Load in the class scope to declare the model as a dependency of the service
-    arima_model = bentoml.picklable_model.get("arima_forecast_model:latest")
+    arima_model = bentoml.models.get("arima_forecast_model:latest")
 
     def __init__(self):
         """
         Initialize the service by loading the model from the model store
         """
-        self.model = self.arima_model.load_model()
+        import joblib
+        self.model = joblib.load(self.arima_model.path_of("model.pkl"))
 
     @bentoml.api
     def forecast(self, data: np.ndarray)-> np.ndarray:
